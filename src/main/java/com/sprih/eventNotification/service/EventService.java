@@ -2,7 +2,7 @@ package com.sprih.eventNotification.service;
 
 import com.sprih.eventNotification.dto.EventRequest;
 import com.sprih.eventNotification.model.Event;
-import com.sprih.eventNotification.model.EventType;
+import com.sprih.eventNotification.model.StatusType;
 import com.sprih.eventNotification.queue.EventQueueManager;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
@@ -24,7 +24,7 @@ public class EventService {
                 request.getEventType(),
                 request.getPayload(),
                 request.getCallbackUrl(),
-                "PENDING"
+                StatusType.PENDING
         );
 
         queueManager.addEvent(event);

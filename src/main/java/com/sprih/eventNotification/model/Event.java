@@ -11,5 +11,5 @@ public class Event {
     private EventType eventType;
     private Object payload;
     private String callbackUrl;
-    private String status;
+    private StatusType status;
 }

@@ -44,7 +44,7 @@ public class WorkerConfig {
 
     @PreDestroy
     public void shutdown() {
-        System.out.println("Shutting down gracefully...");
+        System.out.println("System shutting down gracefully...");
 
         executorService.shutdown();
 
@@ -56,6 +56,6 @@ public class WorkerConfig {
             executorService.shutdownNow();
         }
 
-        System.out.println("Shutdown complete.");
+        System.out.println("System Shutdown complete.");
     }
 }

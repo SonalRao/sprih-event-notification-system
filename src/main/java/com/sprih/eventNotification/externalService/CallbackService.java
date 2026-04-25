@@ -1,6 +1,7 @@
 package com.sprih.eventNotification.externalService;
 
 import com.sprih.eventNotification.model.Event;
+import com.sprih.eventNotification.model.StatusType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,7 +23,7 @@ public class CallbackService {
             body.put("eventType", event.getEventType().toString());
             body.put("processedAt", Instant.now().toString());
 
-            if ("FAILED".equals(event.getStatus())) {
+            if (StatusType.FAILED.equals(event.getStatus())) {
                 body.put("errorMessage", "Simulated processing failure");
             }
 

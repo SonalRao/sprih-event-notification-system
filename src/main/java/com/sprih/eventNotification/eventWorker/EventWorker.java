@@ -3,6 +3,7 @@ package com.sprih.eventNotification.eventWorker;
 import com.sprih.eventNotification.externalService.CallbackService;
 import com.sprih.eventNotification.model.Event;
 import com.sprih.eventNotification.model.EventType;
+import com.sprih.eventNotification.model.StatusType;
 
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -11,7 +12,6 @@ public class EventWorker implements Runnable {
 
         private final BlockingQueue<Event> queue;
         private final EventType eventType;
-        private volatile boolean running = true;
         private final CallbackService callbackService;
 
         public EventWorker(BlockingQueue<Event> queue, EventType eventType, CallbackService callbackService) {
@@ -48,17 +48,13 @@ public class EventWorker implements Runnable {
                     throw new RuntimeException("Simulated failure");
                 }
 
-                event.setStatus("COMPLETED");
+                event.setStatus(StatusType.COMPLETED);
                 System.out.println("Event completed: " + event.getEventId());
                 callbackService.sendCallback(event);
 
             } catch (Exception e) {
-                event.setStatus("FAILED");
+                event.setStatus(StatusType.FAILED);
                 callbackService.sendCallback(event);
             }
-        }
-
-        public void stop() {
-            running = false;
         }
 }
