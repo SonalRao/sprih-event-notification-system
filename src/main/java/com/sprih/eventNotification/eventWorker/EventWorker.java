@@ -21,7 +21,7 @@ public class EventWorker implements Runnable {
         }
         @Override
         public void run() {
-            while (running) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     Event event = queue.take();
 
