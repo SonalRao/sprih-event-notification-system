@@ -1,5 +1,6 @@
 package com.sprih.eventNotification.eventWorker;
 
+import com.sprih.eventNotification.externalService.CallbackService;
 import com.sprih.eventNotification.model.Event;
 import com.sprih.eventNotification.model.EventType;
 
@@ -11,12 +12,13 @@ public class EventWorker implements Runnable {
         private final BlockingQueue<Event> queue;
         private final EventType eventType;
         private volatile boolean running = true;
+        private final CallbackService callbackService;
 
-        public EventWorker(BlockingQueue<Event> queue, EventType eventType) {
+        public EventWorker(BlockingQueue<Event> queue, EventType eventType, CallbackService callbackService) {
             this.queue = queue;
             this.eventType = eventType;
+            this.callbackService = callbackService;
         }
-
         @Override
         public void run() {
             while (running) {
@@ -48,10 +50,11 @@ public class EventWorker implements Runnable {
 
                 event.setStatus("COMPLETED");
                 System.out.println("Event completed: " + event.getEventId());
+                callbackService.sendCallback(event);
 
             } catch (Exception e) {
                 event.setStatus("FAILED");
-                System.out.println("Event failed: " + event.getEventId());
+                callbackService.sendCallback(event);
             }
         }
 
