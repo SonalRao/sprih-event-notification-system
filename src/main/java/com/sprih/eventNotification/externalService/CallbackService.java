@@ -27,8 +27,6 @@ public class CallbackService {
             }
 
             restTemplate.postForObject(event.getCallbackUrl(), body, String.class);
-            System.out.println("Calling URL: " + event.getCallbackUrl());
-            System.out.println("Callback sent for event: " + event.getEventId());
 
         } catch (Exception e) {
             System.out.println("Callback failed for event: " + event.getEventId());
