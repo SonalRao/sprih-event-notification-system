@@ -32,7 +32,7 @@ public class EventWorker implements Runnable {
     @Override
     public void run() {
         log.info("{} worker started", eventType);
-        while (running) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 Event event = queue.take();
                 processEvent(event);
