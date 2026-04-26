@@ -2,6 +2,7 @@ package com.sprih.eventNotification.queue;
 
 import com.sprih.eventNotification.model.Event;
 import com.sprih.eventNotification.model.EventType;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
@@ -13,11 +14,8 @@ public class EventQueueManager {
     private final BlockingQueue<Event> smsQueue = new LinkedBlockingQueue<>();
     private final BlockingQueue<Event> pushQueue = new LinkedBlockingQueue<>();
 
+    @Getter
     private volatile boolean acceptingEvents = true;
-
-    public boolean isAcceptingEvents() {
-        return acceptingEvents;
-    }
 
     public void stopAcceptingEvents() {
         acceptingEvents = false;

@@ -16,7 +16,6 @@ public class EventWorker implements Runnable {
     private final EventType eventType;
     private final CallbackService callbackService;
     private final Random random;
-    private volatile boolean running = true;
 
     public EventWorker(BlockingQueue<Event> queue, EventType eventType, CallbackService callbackService) {
         this(queue, eventType, callbackService, new Random());
