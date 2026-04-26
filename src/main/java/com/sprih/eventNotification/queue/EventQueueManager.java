@@ -13,6 +13,16 @@ public class EventQueueManager {
     private final BlockingQueue<Event> smsQueue = new LinkedBlockingQueue<>();
     private final BlockingQueue<Event> pushQueue = new LinkedBlockingQueue<>();
 
+    private volatile boolean acceptingEvents = true;
+
+    public boolean isAcceptingEvents() {
+        return acceptingEvents;
+    }
+
+    public void stopAcceptingEvents() {
+        acceptingEvents = false;
+    }
+
     public void addEvent(Event event) {
         switch (event.getEventType()) {
             case EMAIL -> emailQueue.add(event);

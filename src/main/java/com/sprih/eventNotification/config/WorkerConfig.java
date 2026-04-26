@@ -6,18 +6,25 @@ import com.sprih.eventNotification.model.EventType;
 import com.sprih.eventNotification.queue.EventQueueManager;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class WorkerConfig {
+    private static final Logger log = LoggerFactory.getLogger(WorkerConfig.class);
 
     private final EventQueueManager queueManager;
     private final CallbackService callbackService;
     private ExecutorService executorService;
+    private List<EventWorker> workers;
 
     public WorkerConfig(EventQueueManager queueManager, CallbackService callbackService) {
         this.queueManager = queueManager;
@@ -28,34 +35,29 @@ public class WorkerConfig {
     public void startWorkers() {
         executorService = Executors.newFixedThreadPool(3);
 
-        executorService.submit(
-                new EventWorker(queueManager.getQueue(EventType.EMAIL), EventType.EMAIL, callbackService)
-        );
+        EventWorker emailWorker = new EventWorker(queueManager.getQueue(EventType.EMAIL), EventType.EMAIL, callbackService);
+        EventWorker smsWorker   = new EventWorker(queueManager.getQueue(EventType.SMS),   EventType.SMS,   callbackService);
+        EventWorker pushWorker  = new EventWorker(queueManager.getQueue(EventType.PUSH),  EventType.PUSH,  callbackService);
 
-        executorService.submit(
-                new EventWorker(queueManager.getQueue(EventType.SMS), EventType.SMS, callbackService)
-        );
-
-        executorService.submit(
-                new EventWorker(queueManager.getQueue(EventType.PUSH), EventType.PUSH, callbackService)
-        );
-        System.out.println("Worker threads started...");
+        workers = List.of(emailWorker, smsWorker, pushWorker);
+        workers.forEach(executorService::submit);
+        log.info("All worker threads started");
     }
 
     @PreDestroy
     public void shutdown() {
-        System.out.println("System shutting down gracefully...");
-
-        executorService.shutdown();
+        log.info("Shutdown signal received...");
+        queueManager.stopAcceptingEvents();
+        executorService.shutdownNow();
 
         try {
             if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
+                log.warn("Workers did not finish in time — forcing shutdown");
             }
         } catch (InterruptedException e) {
-            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
         }
 
-        System.out.println("System Shutdown complete.");
+        log.info("System Shutdown complete");
     }
 }
